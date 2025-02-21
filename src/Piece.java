@@ -76,7 +76,7 @@ public class Piece {
     public List<Piece> getAllOrientations() {
         Set<String> seen = new HashSet<>();
         List<Piece> orientations = new ArrayList<>();
-        Piece current = this;
+        Piece current = this;        
         for (int rot = 0; rot < 4; rot++) {
             addUniqueOrientation(current, orientations, seen);
             Piece flipped = current.flip();
