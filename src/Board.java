@@ -136,8 +136,8 @@ public class Board {
                    pieceGroups.put(currentIdentifier, currentPiece);
                }
 
-               for (List<String> pieceLines : pieceGroups.values()) {
-                   board.pieces.add(new Piece(pieceLines));
+               for (Map.Entry<Character, List<String>> entry : pieceGroups.entrySet()) {
+                   board.pieces.add(new Piece(entry.getValue()));
                }
 
                if (board.pieces.size() != expectedPieces) {
@@ -185,7 +185,6 @@ public class Board {
        if (row < 0 || col < 0 || row + shape.length > rows || col + shape[0].length > cols) {
            return false;
        }
-
        for (int i = 0; i < shape.length; i++) {
            for (int j = 0; j < shape[0].length; j++) {
                if (shape[i][j] == piece.getIdentifier() && grid[row + i][col + j] != '.') {
