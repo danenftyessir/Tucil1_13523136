@@ -280,19 +280,10 @@ public class GUI extends Application implements Solver.SolverListener {
         VBox controlSection = new VBox(10);
         controlSection.setPadding(new Insets(10));
         controlSection.setPrefWidth(250);
-        
-        // File controls
-        TitledPane fileControls = createFileControlsGroup();
-        
-        // Solver controls
+        TitledPane fileControls = createFileControlsGroup();        
         TitledPane solverControls = createSolverControlsGroup();
-        
-        // Display settings
-        TitledPane displaySettings = createDisplaySettingsGroup();
-        
-        // Debug settings
+        TitledPane displaySettings = createDisplaySettingsGroup();        
         TitledPane debugSettings = createDebugSettingsGroup();
-        
         controlSection.getChildren().addAll(fileControls, solverControls, displaySettings, debugSettings);
         return controlSection;
     }
@@ -631,7 +622,6 @@ public class GUI extends Application implements Solver.SolverListener {
         if (currentSolver != null && currentSolver.isRunning()) {
             currentSolver.stop();
         }
-        // Close all file handlers
         for (Handler handler : logger.getHandlers()) {
             handler.close();
         }
