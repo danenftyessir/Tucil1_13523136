@@ -12,11 +12,11 @@ public class Solver {
     private long iterationCount;
     private long startTime;
     private GridPane boardGrid;
-    private long delayMs = 100;
+    private long delayMs = 0;
     private final AtomicBoolean isSolving;
     private List<SolverListener> listeners;
-    private boolean debugMode = true;
-    private boolean showSteps = true;
+    private boolean debugMode = false; 
+    private boolean showSteps = false; 
     
     public interface SolverListener {
         void onIterationComplete(long iteration, String message);
@@ -27,7 +27,7 @@ public class Solver {
         this.board = board;
         this.boardGrid = boardGrid;
         this.iterationCount = 0;
-        this.startTime = System.currentTimeMillis();
+        this.startTime = 0;
         this.isSolving = new AtomicBoolean(false);
         this.listeners = new ArrayList<>();
     }
@@ -52,9 +52,8 @@ public class Solver {
         isSolving.set(true);
         startTime = System.currentTimeMillis();
         iterationCount = 0;
-        
-        debugPrint("Starting solving process...");
-        List<Piece> pieces = new ArrayList<>(board.getPieces());
+        debugPrint("Starting solving process...");        
+        List<Piece> pieces = optimizeOrder(board.getPieces());
         boolean result = tryAllPieces(pieces, 0);
         
         long timeTaken = System.currentTimeMillis() - startTime;
@@ -62,6 +61,29 @@ public class Solver {
         isSolving.set(false);
         
         return result;
+    }
+    
+    private List<Piece> optimizeOrder(List<Piece> pieces) {
+        List<Piece> optimized = new ArrayList<>(pieces);
+        optimized.sort((p1, p2) -> {
+            int size1 = countCells(p1);
+            int size2 = countCells(p2);
+            return Integer.compare(size2, size1);
+        });
+        return optimized;
+    }
+    
+    private int countCells(Piece piece) {
+        int count = 0;
+        char[][] shape = piece.getShape();
+        for (int i = 0; i < piece.getRows(); i++) {
+            for (int j = 0; j < piece.getCols(); j++) {
+                if (shape[i][j] == piece.getIdentifier()) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
     
     public void stop() {
@@ -85,28 +107,33 @@ public class Solver {
         List<Piece> variations = currentPiece.getAllOrientations();
         debugPrint("Generated " + variations.size() + " variations for piece " + currentPiece.getIdentifier());
         
+        List<int[]> positions = getOptimizedPositions(board.getRows(), board.getCols());
+        
         for (Piece variation : variations) {
-            for (int row = 0; row < board.getRows(); row++) {
-                for (int col = 0; col < board.getCols(); col++) {
-                    iterationCount++;
+            for (int[] pos : positions) {
+                int row = pos[0];
+                int col = pos[1];
+                
+                iterationCount++;
+                
+                if (iterationCount % 10000 == 0) {
+                    debugPrint(String.format("Iteration %d: Trying piece %c at (%d,%d)", 
+                        iterationCount, variation.getIdentifier(), row, col));
+                }
+                
+                String message = String.format("Trying piece %c at position (%d,%d)", 
+                    variation.getIdentifier(), row, col);
+                notifyIterationComplete(message);
+                
+                if (board.canPlacePiece(variation, row, col)) {
+                    debugPrint(String.format("Placing piece %c at (%d,%d)", 
+                        variation.getIdentifier(), row, col));
+                    board.placePiece(variation, row, col);
                     
-                    if (iterationCount % 1000 == 0) {
-                        debugPrint(String.format("Iteration %d: Trying piece %c at (%d,%d)", 
-                            iterationCount, variation.getIdentifier(), row, col));
-                    }
-                    
-                    String message = String.format("Trying piece %c at position (%d,%d)", 
-                        variation.getIdentifier(), row, col);
-                    notifyIterationComplete(message);
-                    
-                    if (board.canPlacePiece(variation, row, col)) {
-                        debugPrint(String.format("Placing piece %c at (%d,%d)", 
-                            variation.getIdentifier(), row, col));
-                        board.placePiece(variation, row, col);
-                        
+                    if (showSteps) {
                         updateBoardDisplay();
                         
-                        if (showSteps && boardGrid != null) {
+                        if (boardGrid != null && delayMs > 0) {
                             try {
                                 Thread.sleep(delayMs);
                             } catch (InterruptedException e) {
@@ -114,16 +141,23 @@ public class Solver {
                                 return false;
                             }
                         }
-                        
-                        if (tryAllPieces(pieces, currentIndex + 1)) {
-                            return true;
-                        }
-                        
-                        debugPrint(String.format("Backtracking: Removing piece %c from (%d,%d)", 
-                            variation.getIdentifier(), row, col));
-                        board.removePiece(variation, row, col);
+                    }
+                    
+                    if (tryAllPieces(pieces, currentIndex + 1)) {
+                        return true;
+                    }
+                    
+                    debugPrint(String.format("Backtracking: Removing piece %c from (%d,%d)", 
+                        variation.getIdentifier(), row, col));
+                    board.removePiece(variation, row, col);
+                    
+                    if (showSteps) {
                         updateBoardDisplay();
                     }
+                }
+                
+                if (!isSolving.get()) {
+                    return false;
                 }
             }
         }
@@ -131,8 +165,20 @@ public class Solver {
         return false;
     }
     
+    private List<int[]> getOptimizedPositions(int rows, int cols) {
+        List<int[]> positions = new ArrayList<>();
+        
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                positions.add(new int[]{i, j});
+            }
+        }
+        
+        return positions;
+    }
+    
     private void updateBoardDisplay() {
-        if (boardGrid != null) {
+        if (boardGrid != null && showSteps) {
             Platform.runLater(() -> {
                 boardGrid.getChildren().clear();
                 char[][] grid = board.getGrid();
@@ -191,7 +237,7 @@ public class Solver {
     }
     
     public void setDelay(long milliseconds) {
-        this.delayMs = milliseconds;
+        this.delayMs = showSteps ? milliseconds : 0;
     }
     
     public long getElapsedTime() {
