@@ -16,7 +16,7 @@ public class Main {
         
         if (choice == 1) {
             try {
-                System.out.print("Enter test case file path: ");
+                System.out.print("Enter file path: ");
                 String filePath = scanner.nextLine().trim();
                 File file = new File(filePath);
                 
@@ -27,7 +27,7 @@ public class Main {
                 
                 long startTime = System.currentTimeMillis();
                 Board board = Board.fromFile(file);
-                Solver solver = new Solver(board, null);  // Pass null for GridPane
+                Solver solver = new Solver(board, null);  
                 System.out.println("\nSolving puzzle...");
                 boolean solved = solver.solve();
                 long endTime = System.currentTimeMillis();
