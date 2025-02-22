@@ -50,14 +50,14 @@ Setelah program berjalan, Anda akan diminta memilih mode:
 
 ### Cara Penggunaan Mode Terminal:
 1. Pilih opsi 1 saat diminta memilih mode
-2. Masukkan path file test yang ingin diselesaikan (contoh: test/test1.txt)
+2. Masukkan path file test yang ingin diselesaikan
 3. Program akan mencari solusi dan menampilkan hasilnya
 4. Pilih apakah ingin menyimpan solusi ke file txt
 
 ### Cara Penggunaan Mode GUI:
 1. Pilih opsi 2 saat diminta memilih mode
 2. Klik tombol 'Load Puzzle' untuk memilih file test
-3. Pilih mode penyelesaian (Default/Custom/Pyramid)
+3. Pilih mode penyelesaian (Default/Custom)
 4. Sesuaikan pengaturan:
    - Solving Speed: kecepatan visualisasi
    - Cell Size: ukuran tampilan papan
