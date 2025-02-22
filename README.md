@@ -79,7 +79,7 @@ Setelah program berjalan, Anda akan diminta memilih mode:
 - Antarmuka grafis responsif dan intuitif
 - Mendukung berbagai ukuran papan dan konfigurasi
 
-## 📁 Struktur Repository
+## Struktur Repository
 
 ```
 Tucil1_13523136/
@@ -112,7 +112,7 @@ Tucil1_13523136/
 └── README.md     
 ```
 
-## 👨‍💻 Developer
+## Developer
 
 **Danendra Shafi Athallah**  
 Teknik Informatika - Institut Teknologi Bandung  
@@ -125,4 +125,3 @@ NIM: 13523136
 - Ikuti format input yang sesuai untuk membuat berkas test baru
 - Gunakan fitur debug untuk melihat proses pencarian solusi
 - Manfaatkan GUI untuk pengalaman penyelesaian yang lebih interaktif
-
