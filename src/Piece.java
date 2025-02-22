@@ -11,24 +11,36 @@ public class Piece {
         if (lines == null || lines.isEmpty()) {
             throw new IllegalArgumentException("Empty piece definition");
         }
-        int maxCols = 0;
+
+        this.identifier = findIdentifier(lines);        
+        List<String> normalizedLines = new ArrayList<>();
         for (String line : lines) {
+            line = line.replace(' ', '.');
+            normalizedLines.add(line);
+        }
+        
+        int maxCols = 0;
+        for (String line : normalizedLines) {
             maxCols = Math.max(maxCols, line.length());
         }
-        this.identifier = findIdentifier(lines);
-        this.rows = lines.size();
+        
+        this.rows = normalizedLines.size();
         this.cols = maxCols;
         this.shape = new char[rows][cols];
+        
         for (int i = 0; i < rows; i++) {
             Arrays.fill(shape[i], '.');
         }
         
         for (int i = 0; i < rows; i++) {
-            String line = lines.get(i);
+            String line = normalizedLines.get(i);
             for (int j = 0; j < line.length(); j++) {
-                shape[i][j] = line.charAt(j);
+                if (line.charAt(j) == identifier) {
+                    shape[i][j] = identifier;
+                }
             }
         }
+        
         trimEmptySpace();
     }
     
